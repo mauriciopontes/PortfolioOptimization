@@ -6,7 +6,7 @@ def main():
         profile="Moderado",
         tolerance_risk=0.05,  # Tolerância ao risco de 5%
         assets=["AAPL", "MSFT", "GOOGL"],  # Ativos do portfolio
-        risk_free_rate=0.02  # Taxa livre de risco de 2%
+        risk_free_rate=0.03  # Taxa livre de risco de 2%
     )
 
     # Obtendo o portfolio de mercado otimizado
