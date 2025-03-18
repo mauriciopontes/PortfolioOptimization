@@ -9,13 +9,12 @@ class Investor:
     profile: str
     tolerance_risk: float
     assets: List[str]
-    
-    # Período padrão de dados (pode ser sobrescrito)
-    DATA_PERIOD: str = "2y"
-    ANNUALIZATION_FACTOR: int = 252
+    data_period: str = "2y"  # Opcional, com valor padrão
+    annualization_factor: int = 252  # Opcional, com valor padrão
     
     def __post_init__(self):
-        """Inicialização pós-dataclass com validações e cálculos."""
+        self.DATA_PERIOD = self.data_period
+        self.ANNUALIZATION_FACTOR = self.annualization_factor
         self._validate_inputs()
         self._data = self._fetch_financial_data()
         self._daily_returns = self._calculate_daily_returns()
@@ -23,7 +22,6 @@ class Investor:
         self._cov_matrix = self._calculate_cov_matrix()
 
     def _validate_inputs(self) -> None:
-        """Valida os parâmetros de entrada."""
         if not isinstance(self.profile, str) or not self.profile.strip():
             raise ValueError("Profile deve ser uma string não vazia")
         if not isinstance(self.tolerance_risk, (int, float)) or self.tolerance_risk < 0:
@@ -32,9 +30,12 @@ class Investor:
             raise ValueError("Assets deve ser uma lista não vazia")
         if not all(isinstance(asset, str) for asset in self.assets):
             raise ValueError("Todos os assets devem ser strings")
+        if not isinstance(self.DATA_PERIOD, str):
+            raise ValueError("data_period deve ser uma string")
+        if not isinstance(self.ANNUALIZATION_FACTOR, int) or self.ANNUALIZATION_FACTOR <= 0:
+            raise ValueError("annualization_factor deve ser um inteiro positivo")
 
     def _fetch_financial_data(self) -> pd.DataFrame:
-        """Obtém dados financeiros dos ativos usando yfinance."""
         try:
             data = yf.download(self.assets, period=self.DATA_PERIOD, progress=False)['Close']
             if data.empty:
@@ -44,33 +45,18 @@ class Investor:
             raise RuntimeError(f"Falha ao obter dados financeiros: {str(e)}")
 
     def _calculate_daily_returns(self) -> pd.DataFrame:
-        """Calcula os retornos diários dos ativos."""
         return self._data.pct_change().dropna()
 
     def _calculate_annual_returns(self) -> pd.Series:
-        """Calcula os retornos anualizados esperados."""
         return self._daily_returns.mean() * self.ANNUALIZATION_FACTOR
 
     def _calculate_cov_matrix(self) -> pd.DataFrame:
-        """Calcula a matriz de covariância anualizada."""
         return self._daily_returns.cov() * self.ANNUALIZATION_FACTOR
 
     @property
     def returns_annualized(self) -> pd.Series:
-        """Retorna os retornos anualizados dos ativos."""
         return self._annual_returns
 
     @property
     def covariance_matrix(self) -> pd.DataFrame:
-        """Retorna a matriz de covariância dos ativos."""
         return self._cov_matrix
-
-    @property
-    def daily_returns(self) -> pd.DataFrame:
-        """Retorna os retornos diários dos ativos."""
-        return self._daily_returns
-
-    @property
-    def financial_data(self) -> pd.DataFrame:
-        """Retorna os dados financeiros brutos dos ativos."""
-        return self._data
