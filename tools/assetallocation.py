@@ -7,16 +7,15 @@ from tools.profile_management import Investor
 @dataclass
 class AssetAllocation(Investor):
     """Classe para alocação de ativos baseada em otimização de portfolio."""
-    risk_free_rate: float
-    
     INITIAL_WEIGHTS: np.ndarray = None
     CONSTRAINTS: tuple = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1},)
     BOUNDS: tuple = None
     
     def __post_init__(self):
-        super().__post_init__()
-        if not isinstance(self.risk_free_rate, (int, float)) or self.risk_free_rate < 0:
-            raise ValueError("risk_free_rate deve ser um número não negativo")
+        super().__post_init__() 
+        # Tornar risk_free_rate obrigatório em AssetAllocation
+        if self.risk_free_rate is None:
+            raise ValueError("risk_free_rate é obrigatório para AssetAllocation")
         
         n_assets = len(self.assets)
         if self.INITIAL_WEIGHTS is None:

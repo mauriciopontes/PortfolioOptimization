@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 import yfinance as yf
 import pandas as pd
 from dataclasses import dataclass
@@ -9,8 +9,9 @@ class Investor:
     profile: str
     tolerance_risk: float
     assets: List[str]
-    data_period: str = "2y"
-    annualization_factor: int = 252
+    risk_free_rate: Optional[float] = None  # Opcional, padrão None
+    data_period: str = "2y"  # Opcional com valor padrão
+    annualization_factor: int = 252  # Opcional com valor padrão
     
     def __post_init__(self):
         self.DATA_PERIOD = self.data_period
@@ -30,6 +31,8 @@ class Investor:
             raise ValueError("Assets deve ser uma lista não vazia")
         if not all(isinstance(asset, str) for asset in self.assets):
             raise ValueError("Todos os assets devem ser strings")
+        if self.risk_free_rate is not None and (not isinstance(self.risk_free_rate, (int, float)) or self.risk_free_rate < 0):
+            raise ValueError("risk_free_rate deve ser um número não negativo ou None")
         if not isinstance(self.DATA_PERIOD, str):
             raise ValueError("data_period deve ser uma string")
         if not isinstance(self.ANNUALIZATION_FACTOR, int) or self.ANNUALIZATION_FACTOR <= 0:
