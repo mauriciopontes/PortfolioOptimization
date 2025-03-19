@@ -9,9 +9,9 @@ class Investor:
     profile: str
     tolerance_risk: float
     assets: List[str]
-    risk_free_rate: Optional[float] = None  # Opcional, padrão None
-    data_period: str = "2y"  # Opcional com valor padrão
-    annualization_factor: int = 252  # Opcional com valor padrão
+    risk_free_rate: Optional[float] = None
+    data_period: str = "2y" 
+    annualization_factor: int = 252
     
     def __post_init__(self):
         self.DATA_PERIOD = self.data_period
