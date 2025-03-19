@@ -1,29 +1,27 @@
 from tools.assetallocation import AssetAllocation
+from tools.dataviz import PortfolioVisualizer
 
 def main():
-    # Criando um investidor
+    # Instanciando o investidor
     investor = AssetAllocation(
-        profile="Moderado",
-        tolerance_risk=0.05,  # Tolerância ao risco de 5%
-        assets=["AAPL", "MSFT", "GOOGL"],  # Ativos do portfolio
-        risk_free_rate=0.03  # Taxa livre de risco de 2%
+        profile='Moderado',
+        tolerance_risk=0.08,
+        assets=['KLBN11.SA', 'SAPR11.SA', 'GGBR4.SA', 'ITSA4.SA', 'TAEE11.SA', 'VBBR3.SA'],
+        risk_free_rate=0.02,
+        data_period="1y",
+        annualization_factor=252
     )
 
-    # Obtendo o portfolio de mercado otimizado
-    market_portfolio = investor.get_market_portfolio()
-    print("Portfolio de Mercado:")
-    print(f"Pesos Otimizados: {market_portfolio['optimal_weights']}")
-    print(f"Retorno Esperado: {market_portfolio['expected_return']:.4f}")
-    print(f"Risco: {market_portfolio['risk']:.4f}")
-    print(f"Sharpe Ratio: {market_portfolio['sharpe_ratio']:.4f}\n")
+    # Instanciando o visualizador com a opção de exibir resultados formatados
+    visualizer = PortfolioVisualizer(
+        asset_allocation=investor,
+        show_formatted_results=True
+    )
 
-    # Obtendo o portfolio ajustado pela tolerância ao risco
-    risk_controlled_portfolio = investor.get_risk_controlled_portfolio(investor.tolerance_risk)
-    print("Portfolio Controlado por Risco:")
-    print(f"Pesos Otimizados: {risk_controlled_portfolio['optimal_weights']}")
-    print(f"Retorno Esperado: {risk_controlled_portfolio['expected_return']:.4f}")
-    print(f"Risco: {risk_controlled_portfolio['risk']:.4f}")
-    print(f"Sharpe Ratio: {risk_controlled_portfolio['sharpe_ratio']:.4f}")
+    # Gerando os gráficos
+    visualizer.plot_efficient_frontier(num_portfolios=10000)
+    visualizer.plot_portfolio_composition(portfolio_type='market')
+    visualizer.plot_portfolio_composition(portfolio_type='risk_controlled')
 
 if __name__ == "__main__":
     main()
